@@ -7,12 +7,12 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class GameBoardPanel extends JPanel {
-    private int rows;
-    private int cols;
-    private int[][] maze;
-    private boolean[][] dots;
-    private Frames.Pacman pacman;
-    private final short levelData[] = {
+    private final int rows;
+    private final int cols;
+    private final int[][] maze;
+    private final boolean[][] dots;
+    private final Frames.Pacman pacman;
+    private final short[] levelData = {
             19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22, 19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22,
             21,  0,  0,  0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20, 21,  0,  0,  0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,
             21,  0,  0,  0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20, 21,  0,  0,  0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,
@@ -141,7 +141,7 @@ public class GameBoardPanel extends JPanel {
                 int index = i * levelWidth + j;
 
                 if (index < levelData.length)
-                    maze[i][j] = (levelData[index] == 0) ? 1 : 0; // reverse logic
+                    maze[i][j] = (levelData[index] == 0) ? 1 : 0;
                 else
                     maze[i][j] = 0;
             }

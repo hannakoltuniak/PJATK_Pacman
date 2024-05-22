@@ -2,11 +2,9 @@ package Frames;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class MenuFrame extends JFrame {
-    private JPanel mainPanel;
+    private final JPanel mainPanel;
 
     public MenuFrame() {
         this.setTitle("HK_Pacman");
@@ -45,12 +43,7 @@ public class MenuFrame extends JFrame {
         newGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         newGameButton.setForeground(Color.YELLOW);
         newGameButton.setBackground(new Color(32, 32, 32));
-        newGameButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showBoardSizeMenu();
-            }
-        });
+        newGameButton.addActionListener(e -> showBoardSizeMenu());
 
         JButton highScoresButton = new JButton("High Scores");
         highScoresButton.setFont(buttonFont);
@@ -117,32 +110,32 @@ public class MenuFrame extends JFrame {
 
     private void startGameWithSize(String size) {
         int rows, cols;
-        switch (size) {
-            case "Small":
+        cols = switch (size) {
+            case "Small" -> {
                 rows = 10;
-                cols = 10;
-                break;
-            case "Medium":
+                yield 10;
+            }
+            case "Medium" -> {
                 rows = 15;
-                cols = 15;
-                break;
-            case "Large":
+                yield 15;
+            }
+            case "Large" -> {
                 rows = 20;
-                cols = 20;
-                break;
-            case "Very Large":
+                yield 20;
+            }
+            case "Very Large" -> {
                 rows = 25;
-                cols = 25;
-                break;
-            case "Huge":
+                yield 25;
+            }
+            case "Huge" -> {
                 rows = 30;
-                cols = 30;
-                break;
-            default:
-                rows = 15;
-                cols = 15;
-                break;
-        }
+                yield 30;
+            }
+            default -> {
+                rows = 5;
+                yield 5;
+            }
+        };
 
         mainPanel.removeAll();
 
