@@ -1,17 +1,26 @@
 package Frames;
+import Characters.Pacman;
+import Characters.Ghost;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+
 public class GameBoardPanel extends JPanel {
     private final int rows;
     private final int cols;
     private final int[][] maze;
     private final boolean[][] dots;
-    private final Frames.Pacman pacman;
+    private final Pacman pacman;
+    private final List<Ghost> ghosts;
+    private final int numGhosts = 4;
+    private final Random random = new Random();
     private final short[] levelData = {
             19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22, 19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22,
             21,  0,  0,  0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20, 21,  0,  0,  0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,
@@ -51,7 +60,10 @@ public class GameBoardPanel extends JPanel {
         this.maze = generateMaze(rows, cols);
         this.dots = new boolean[rows][cols];
         initializeDots();
-        this.pacman = new Frames.Pacman(1, 1, 20);
+        this.pacman = new Pacman(1, 1, 20);
+        this.ghosts = new ArrayList<>();
+        spawnGhosts(4);
+
         this.setPreferredSize(new Dimension(cols * 20, rows * 20));
         this.setBackground(Color.BLACK);
         this.setOpaque(false);
@@ -67,23 +79,28 @@ public class GameBoardPanel extends JPanel {
                 int keyCode = e.getKeyCode();
                 switch (keyCode) {
                     case KeyEvent.VK_UP:
-                        pacman.move(0, -1, maze);
+                        pacman.setDirection(0, -1);
                         break;
                     case KeyEvent.VK_DOWN:
-                        pacman.move(0, 1, maze);
+                        pacman.setDirection(0, 1);
                         break;
                     case KeyEvent.VK_LEFT:
-                        pacman.move(-1, 0, maze);
+                        pacman.setDirection(-1, 0);
                         break;
                     case KeyEvent.VK_RIGHT:
-                        pacman.move(1, 0, maze);
+                        pacman.setDirection(1, 0);
                         break;
                 }
 
                 eatDot(pacman.getX(), pacman.getY());
+                checkCollision();
                 repaint();
             }
         });
+
+        startPacmanThread();
+        startGhostThreads();
+        startPacmanAnimation();
     }
 
     @Override
@@ -92,6 +109,28 @@ public class GameBoardPanel extends JPanel {
         drawPacmanMaze(g);
         drawDots(g);
         pacman.draw(g);
+        for (Ghost ghost : ghosts) {
+            ghost.draw(g);
+        }
+    }
+
+    private void startPacmanThread() {
+        Thread pacmanThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(200);
+                    pacman.move(maze);
+                    eatDot(pacman.getX(), pacman.getY());
+                    checkCollision();
+                    repaint();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        });
+
+        pacmanThread.start();
     }
 
     private void drawPacmanMaze(Graphics g) {
@@ -150,6 +189,87 @@ public class GameBoardPanel extends JPanel {
         maze[1][1] = 0;
 
         return maze;
+    }
+
+    private void spawnGhosts(int numGhosts) {
+        Color[] colors = {Color.RED, Color.GREEN, Color.PINK, Color.ORANGE};
+
+        for (int i = 0; i < numGhosts; i++) {
+            int x, y;
+            do {
+                x = random.nextInt(cols);
+                y = random.nextInt(rows);
+            } while (maze[y][x] != 0);
+
+            ghosts.add(new Ghost(x, y, 20, colors[i % colors.length]));
+        }
+    }
+
+    private void startGhostThreads() {
+        for (Ghost ghost : ghosts) {
+            Thread ghostThread = new Thread(() -> {
+                while (true) {
+                    try {
+                        Thread.sleep(250);
+                        if (isPacmanNearby(ghost)) {
+                            ghost.moveTowards(pacman.getX(), pacman.getY(), maze, this);
+                        } else {
+                            ghost.move(maze);
+                        }
+                        checkCollision();
+                        repaint();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
+            });
+            ghostThread.start();
+        }
+    }
+
+    private boolean isPacmanNearby(Ghost ghost) {
+        int distance = Math.abs(pacman.getX() - ghost.getX()) + Math.abs(pacman.getY() - ghost.getY());
+        int range = 5;
+        return distance < range;
+    }
+
+    public boolean isPositionOccupiedByGhost(int x, int y) {
+        for (Ghost ghost : ghosts) {
+            if (ghost.getX() == x && ghost.getY() == y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void checkCollision() {
+        for (Ghost ghost : ghosts) {
+            if (ghost.getX() == pacman.getX() && ghost.getY() == pacman.getY()) {
+                gameOver();
+            }
+        }
+    }
+
+    private void startPacmanAnimation() {
+        Thread mouthAnimationThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(100);
+                    pacman.animateMouth();
+                    repaint();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        });
+        mouthAnimationThread.start();
+    }
+
+    private void gameOver() {
+        System.out.println("game over");
+        System.exit(0);
     }
 
 }
