@@ -1,21 +1,19 @@
 package Characters;
 import Frames.GameBoardPanel;
 
-import java.awt.*;
+import javax.swing.*;
 import java.util.Random;
 
 public class Ghost {
     private int x, y;
-    private final int size;
-    private final Color color;
     private final Random random;
+    private ImageIcon icon;
 
-    public Ghost(int x, int y, int size, Color color) {
+    public Ghost(int x, int y, ImageIcon icon) {
         this.x = x;
         this.y = y;
-        this.size = size;
-        this.color = color;
         this.random = new Random();
+        this.icon = icon;
     }
 
     public int getX() {
@@ -66,8 +64,7 @@ public class Ghost {
         y = bestY;
     }
 
-    public void draw(Graphics g) {
-        g.setColor(color);
-        g.fillRect(x * size, y * size, size, size);
+    public ImageIcon getIcon() {
+        return icon;
     }
 }

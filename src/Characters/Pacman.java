@@ -1,45 +1,28 @@
 package Characters;
 
-import java.awt.*;
+import javax.swing.*;
 
 public class Pacman {
     private int x;
     private int y;
-    private int cellSize;
     private int dx;
     private int dy;
-    private boolean mouthOpen;
-    private int mouthAngle;
-    private int mouthDirection;
+    private int direction;
+    private ImageIcon[] currentIcons;
 
-
-    public Pacman(int startX, int startY, int cellSize) {
+    public Pacman(int startX, int startY) {
         this.x = startX;
         this.y = startY;
-        this.cellSize = cellSize;
         this.dx = 0;
         this.dy = 0;
 
-        this.mouthOpen = true;
-        this.mouthAngle = 45;
-        this.mouthDirection = 1;
-    }
-
-    public void draw(Graphics g) {
-        g.setColor(Color.YELLOW);
-        if (mouthOpen) {
-            int startAngle = getStartAngle();
-            int arcAngle = 300;
-            g.fillArc(x * cellSize, y * cellSize, cellSize, cellSize, startAngle, arcAngle);
-        } else {
-            g.fillOval(x * cellSize, y * cellSize, cellSize, cellSize);
-        }
+        this.currentIcons = new ImageIcon[3];
     }
 
     public void move(int[][] maze) {
         int newX = x + dx;
         int newY = y + dy;
-        if (newX >= 0 && newY >= 0 && newX < maze[0].length && newY < maze.length && maze[newY][newX] == 0) {
+        if (isValidMove(newX, newY, maze)) {
             x = newX;
             y = newY;
         }
@@ -48,7 +31,17 @@ public class Pacman {
     public void setDirection(int dx, int dy) {
         this.dx = dx;
         this.dy = dy;
+        if (dx == 1) {
+            direction = 0; // Right
+        } else if (dx == -1) {
+            direction = 2; // Left
+        } else if (dy == -1) {
+            direction = 1; // Up
+        } else if (dy == 1) {
+            direction = 3; // Down
+        }
     }
+
 
     public int getX() {
         return x;
@@ -58,19 +51,15 @@ public class Pacman {
         return y;
     }
 
-    public void animateMouth() {
-        mouthOpen = !mouthOpen;
+    public void setCurrentIcons(ImageIcon[] icons) {
+        this.currentIcons = icons;
     }
 
-    private int getStartAngle() {
-        if (dx == 1) return 45;
-        if (dx == -1) return 225;
-        if (dy == -1) return 135;
-        if (dy == 1) return 315;
-        return 45;
+    public ImageIcon getCurrentIcon(int index) {
+        return currentIcons[index % 3];
     }
 
-    private int getArcAngle() {
-        return 360 - mouthAngle * 2;
+    private boolean isValidMove(int x, int y, int[][] maze) {
+        return x >= 0 && y >= 0 && x < maze[0].length && y < maze.length && maze[y][x] == 0;
     }
 }

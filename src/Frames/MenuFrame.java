@@ -16,7 +16,6 @@ public class MenuFrame extends JFrame {
         this.getContentPane().setBackground(new Color(32, 32, 32));
         this.setLayout(new BorderLayout());
 
-        // Initialize main panel
         mainPanel = new JPanel(new BorderLayout());
         mainPanel.setOpaque(false);
         this.add(mainPanel, BorderLayout.CENTER);
