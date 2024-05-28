@@ -2,7 +2,6 @@ package Frames;
 import Characters.Pacman;
 import Characters.Ghost;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -14,6 +13,7 @@ import java.awt.event.KeyEvent;
 
 
 public class GameBoardPanel extends JPanel {
+    //TODO: make better lvl data
     //region Leveldata
     private final short[] levelData = {
             19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22, 19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22,
@@ -56,7 +56,6 @@ public class GameBoardPanel extends JPanel {
     private final List<Ghost> ghosts;
     private final Random random = new Random();
     private final JLabel[][] grid;
-    private final ImageIcon[][] pacmanIcons;
     private final ImageIcon dotIcon;
     private final ImageIcon wallIcon;
     private final ImageIcon emptyIcon;
@@ -69,12 +68,6 @@ public class GameBoardPanel extends JPanel {
         this.dots = new boolean[rows][cols];
         this.grid = new JLabel[rows][cols];
 
-        this.pacmanIcons = new ImageIcon[][]{
-                {new ImageIcon("src/Pngs/pacman/pacman_right_1.png"), new ImageIcon("src/Pngs/pacman/pacman_right_2.png"), new ImageIcon("src/Pngs/pacman/pacman_right_3.png")},
-                {new ImageIcon("src/Pngs/pacman/pacman_up_1.png"), new ImageIcon("src/Pngs/pacman/pacman_up_2.png"), new ImageIcon("src/Pngs/pacman/pacman_up_3.png")},
-                {new ImageIcon("src/Pngs/pacman/pacman_left_1.png"), new ImageIcon("src/Pngs/pacman/pacman_left_2.png"), new ImageIcon("src/Pngs/pacman/pacman_left_3.png")},
-                {new ImageIcon("src/Pngs/pacman/pacman_down_1.png"), new ImageIcon("src/Pngs/pacman/pacman_down_2.png"), new ImageIcon("src/Pngs/pacman/pacman_down_3.png")}
-        };
         this.dotIcon = new ImageIcon("src/Pngs/dot.png");
         this.wallIcon = new ImageIcon("src/Pngs/wall.png");
         this.emptyIcon = new ImageIcon("src/Pngs/empty.png");
@@ -94,7 +87,7 @@ public class GameBoardPanel extends JPanel {
 
         createGrid();
 
-        pacman.setCurrentIcons(pacmanIcons[0]);
+        pacman.setCurrentIcons(pacman.pacmanIcons[0]);
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -102,23 +95,23 @@ public class GameBoardPanel extends JPanel {
                 switch (keyCode) {
                     case KeyEvent.VK_UP:
                         pacman.setDirection(0, -1);
-                        pacman.setCurrentIcons(pacmanIcons[1]);
+                        pacman.setCurrentIcons(pacman.pacmanIcons[1]);
                         break;
                     case KeyEvent.VK_DOWN:
                         pacman.setDirection(0, 1);
-                        pacman.setCurrentIcons(pacmanIcons[3]);
+                        pacman.setCurrentIcons(pacman.pacmanIcons[3]);
                         break;
                     case KeyEvent.VK_LEFT:
                         pacman.setDirection(-1, 0);
-                        pacman.setCurrentIcons(pacmanIcons[2]);
+                        pacman.setCurrentIcons(pacman.pacmanIcons[2]);
                         break;
                     case KeyEvent.VK_RIGHT:
                         pacman.setDirection(1, 0);
-                        pacman.setCurrentIcons(pacmanIcons[0]);
+                        pacman.setCurrentIcons(pacman.pacmanIcons[0]);
                         break;
                 }
 
-                eatDot(pacman.getX(), pacman.getY());
+                removeDot(pacman.getX(), pacman.getY());
                 checkCollision();
                 updateGrid();
             }
@@ -156,11 +149,11 @@ public class GameBoardPanel extends JPanel {
                 cell.setOpaque(true);
                 cell.setHorizontalAlignment(SwingConstants.CENTER);
 
-                if (maze[i][j] == 1) {
+                if (maze[i][j] == 1)
                     cell.setIcon(wallIcon);
-                } else if (dots[i][j]) {
+                 else if (dots[i][j])
                     cell.setIcon(dotIcon);
-                }
+
 
                 grid[i][j] = cell;
                 this.add(cell);
@@ -195,7 +188,7 @@ public class GameBoardPanel extends JPanel {
                 try {
                     Thread.sleep(200);
                     pacman.move(maze);
-                    eatDot(pacman.getX(), pacman.getY());
+                    removeDot(pacman.getX(), pacman.getY());
                     checkCollision();
                     updateGrid();
                 } catch (InterruptedException e) {
@@ -213,7 +206,7 @@ public class GameBoardPanel extends JPanel {
             while (true) {
                 try {
                     Thread.sleep(100);
-                    pacmanAnimationIndex = (pacmanAnimationIndex + 1) % pacmanIcons.length;
+                    pacmanAnimationIndex = (pacmanAnimationIndex + 1) % pacman.pacmanIcons.length;
                     updateGrid();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -235,7 +228,7 @@ public class GameBoardPanel extends JPanel {
         dots[1][1] = false;
     }
 
-    private void eatDot(int x, int y) {
+    private void removeDot(int x, int y) {
         if (x >= 0 && x < cols && y >= 0 && y < rows && dots[y][x]) {
             dots[y][x] = false;
             grid[y][x].setIcon(emptyIcon);
@@ -266,7 +259,7 @@ public class GameBoardPanel extends JPanel {
                 while (true) {
                     try {
                         Thread.sleep(250);
-                        if (isPacmanNearby(ghost)) {
+                        if (isPacmanClose(ghost)) {
                             ghost.moveTowards(pacman.getX(), pacman.getY(), maze, this);
                         } else {
                             ghost.move(maze);
@@ -283,13 +276,13 @@ public class GameBoardPanel extends JPanel {
         }
     }
 
-    private boolean isPacmanNearby(Ghost ghost) {
+    private boolean isPacmanClose(Ghost ghost) {
         int distance = Math.abs(pacman.getX() - ghost.getX()) + Math.abs(pacman.getY() - ghost.getY());
         int range = 5;
         return distance < range;
     }
 
-    public boolean isPositionOccupiedByGhost(int x, int y) {
+    public boolean isPositionAvailable(int x, int y) {
         for (Ghost ghost : ghosts) {
             if (ghost.getX() == x && ghost.getY() == y) {
                 return true;
@@ -300,8 +293,13 @@ public class GameBoardPanel extends JPanel {
 
     private void checkCollision() {
         for (Ghost ghost : ghosts) {
-            if (ghost.getX() == pacman.getX() && ghost.getY() == pacman.getY()) {
-                gameOver();
+            if (pacman.getX() == ghost.getX() && pacman.getY() == ghost.getY()) {
+                pacman.loseLife();
+                if (pacman.getLives() <= 0) {
+                    gameOver();
+                } else {
+                    pacman.resetPacmanPosition();
+                }
             }
         }
     }

@@ -115,24 +115,24 @@ public class MenuFrame extends JFrame {
                 yield 10;
             }
             case "Medium" -> {
+                rows = 12;
+                yield 12;
+            }
+            case "Large" -> {
                 rows = 15;
                 yield 15;
             }
-            case "Large" -> {
+            case "Very Large" -> {
+                rows = 17;
+                yield 17;
+            }
+            case "Huge" -> {
                 rows = 20;
                 yield 20;
             }
-            case "Very Large" -> {
-                rows = 25;
-                yield 25;
-            }
-            case "Huge" -> {
-                rows = 30;
-                yield 30;
-            }
             default -> {
-                rows = 5;
-                yield 5;
+                rows = 3;
+                yield 3;
             }
         };
 

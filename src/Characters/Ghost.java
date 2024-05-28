@@ -50,7 +50,7 @@ public class Ghost {
             int newY = y + dy[i];
 
             if (newX >= 0 && newX < maze[0].length && newY >= 0 && newY < maze.length && maze[newY][newX] == 0 &&
-                    !gameBoard.isPositionOccupiedByGhost(newX, newY)) {
+                    !gameBoard.isPositionAvailable(newX, newY)) {
                 int newDistance = Math.abs(pacmanX - newX) + Math.abs(pacmanY - newY);
                 if (newDistance < bestDistance) {
                     bestX = newX;
@@ -63,6 +63,7 @@ public class Ghost {
         x = bestX;
         y = bestY;
     }
+
 
     public ImageIcon getIcon() {
         return icon;

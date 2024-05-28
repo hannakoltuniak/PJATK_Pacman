@@ -9,19 +9,29 @@ public class Pacman {
     private int dy;
     private int direction;
     private ImageIcon[] currentIcons;
+    public final ImageIcon[][] pacmanIcons;
+    private int lives;
 
     public Pacman(int startX, int startY) {
         this.x = startX;
         this.y = startY;
         this.dx = 0;
         this.dy = 0;
+        this.lives = 3;
 
         this.currentIcons = new ImageIcon[3];
+        this.pacmanIcons = new ImageIcon[][]{
+                {new ImageIcon("src/Pngs/pacman/pacman_right_1.png"), new ImageIcon("src/Pngs/pacman/pacman_right_2.png"), new ImageIcon("src/Pngs/pacman/pacman_right_3.png")},
+                {new ImageIcon("src/Pngs/pacman/pacman_up_1.png"), new ImageIcon("src/Pngs/pacman/pacman_up_2.png"), new ImageIcon("src/Pngs/pacman/pacman_up_3.png")},
+                {new ImageIcon("src/Pngs/pacman/pacman_left_1.png"), new ImageIcon("src/Pngs/pacman/pacman_left_2.png"), new ImageIcon("src/Pngs/pacman/pacman_left_3.png")},
+                {new ImageIcon("src/Pngs/pacman/pacman_down_1.png"), new ImageIcon("src/Pngs/pacman/pacman_down_2.png"), new ImageIcon("src/Pngs/pacman/pacman_down_3.png")}
+        };
     }
 
     public void move(int[][] maze) {
         int newX = x + dx;
         int newY = y + dy;
+
         if (isValidMove(newX, newY, maze)) {
             x = newX;
             y = newY;
@@ -31,17 +41,16 @@ public class Pacman {
     public void setDirection(int dx, int dy) {
         this.dx = dx;
         this.dy = dy;
-        if (dx == 1) {
-            direction = 0; // Right
-        } else if (dx == -1) {
-            direction = 2; // Left
-        } else if (dy == -1) {
-            direction = 1; // Up
-        } else if (dy == 1) {
-            direction = 3; // Down
-        }
-    }
 
+        if (dx == 1)
+            direction = 0; // Right
+        else if (dx == -1)
+            direction = 2; // Left
+         else if (dy == -1)
+            direction = 1; // Up
+        else if (dy == 1)
+            direction = 3; // Down
+    }
 
     public int getX() {
         return x;
@@ -49,6 +58,20 @@ public class Pacman {
 
     public int getY() {
         return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void resetPacmanPosition() {
+        setX(0);
+        setY(0);
+        setDirection(0, 0);
     }
 
     public void setCurrentIcons(ImageIcon[] icons) {
@@ -61,5 +84,14 @@ public class Pacman {
 
     private boolean isValidMove(int x, int y, int[][] maze) {
         return x >= 0 && y >= 0 && x < maze[0].length && y < maze.length && maze[y][x] == 0;
+    }
+
+
+    public int getLives() {
+        return lives;
+    }
+
+    public void loseLife() {
+        this.lives--;
     }
 }
