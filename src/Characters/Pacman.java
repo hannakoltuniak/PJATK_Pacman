@@ -86,12 +86,13 @@ public class Pacman {
         return x >= 0 && y >= 0 && x < maze[0].length && y < maze.length && maze[y][x] == 0;
     }
 
-
     public int getLives() {
         return lives;
     }
 
     public void loseLife() {
-        this.lives--;
+        if (lives > 0) {
+            lives--;
+        }
     }
 }

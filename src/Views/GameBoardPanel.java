@@ -1,4 +1,4 @@
-package Frames;
+package Views;
 import Characters.Pacman;
 import Characters.Ghost;
 
@@ -11,41 +11,31 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-
 public class GameBoardPanel extends JPanel {
     //TODO: make better lvl data
     //region Leveldata
     private final short[] levelData = {
-            19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22, 19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22,
-            21,  0,  0,  0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20, 21,  0,  0,  0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,
-            21,  0,  0,  0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20, 21,  0,  0,  0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,
-            21,  0,  0,  0, 17, 16, 16, 24, 16, 16, 16, 16, 16, 16, 20, 21,  0,  0,  0, 17, 16, 16, 24, 16, 16, 16, 16, 16, 16, 20,
-            17, 18, 18, 18, 16, 16, 20,  0, 17, 16, 16, 16, 16, 16, 20, 17, 18, 18, 18, 16, 16, 20,  0, 17, 16, 16, 16, 16, 16, 20,
-            17, 16, 16, 16, 16, 16, 20,  0, 17, 16, 16, 16, 16, 24, 20, 17, 16, 16, 16, 16, 16, 20,  0, 17, 16, 16, 16, 16, 24, 20,
-            25, 16, 16, 16, 24, 24, 28,  0, 25, 24, 24, 16, 20,  0, 21, 25, 16, 16, 16, 24, 24, 28,  0, 25, 24, 24, 16, 20,  0, 21,
-            1, 17, 16, 20,  0,  0,  0,  0,  0,  0,  0, 17, 20,  0, 21,  1, 17, 16, 20,  0,  0,  0,  0,  0,  0,  0, 17, 20,  0, 21,
-            1, 17, 16, 16, 18, 18, 22,  0, 19, 18, 18, 16, 20,  0, 21,  1, 17, 16, 16, 18, 18, 22,  0, 19, 18, 18, 16, 20,  0, 21,
-            1, 17, 16, 16, 16, 16, 20,  0, 17, 16, 16, 16, 20,  0, 21,  1, 17, 16, 16, 16, 16, 20,  0, 17, 16, 16, 16, 20,  0, 21,
-            1, 17, 16, 16, 16, 16, 20,  0, 17, 16, 16, 16, 20,  0, 21,  1, 17, 16, 16, 16, 16, 20,  0, 17, 16, 16, 16, 20,  0, 21,
-            1, 17, 16, 16, 16, 16, 16, 18, 16, 16, 16, 16, 20,  0, 21,  1, 17, 16, 16, 16, 16, 16, 18, 16, 16, 16, 16, 20,  0, 21,
-            1, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,  0, 21,  1, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,  0, 21,
-            1, 25, 24, 24, 24, 24, 24, 24, 24, 24, 16, 16, 16, 18, 20,  1, 25, 24, 24, 24, 24, 24, 24, 24, 24, 16, 16, 16, 18, 20,
-            9,  8,  8,  8,  8,  8,  8,  8,  8,  8, 25, 24, 24, 24, 28,  9,  8,  8,  8,  8,  8,  8,  8,  8,  8, 25, 24, 24, 24, 28,
-            19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22, 19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22,
-            21,  0,  0,  0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20, 21,  0,  0,  0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,
-            21,  0,  0,  0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20, 21,  0,  0,  0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,
-            21,  0,  0,  0, 17, 16, 16, 24, 16, 16, 16, 16, 16, 16, 20, 21,  0,  0,  0, 17, 16, 16, 24, 16, 16, 16, 16, 16, 16, 20,
-            17, 18, 18, 18, 16, 16, 20,  0, 17, 16, 16, 16, 16, 16, 20, 17, 18, 18, 18, 16, 16, 20,  0, 17, 16, 16, 16, 16, 16, 20,
-            17, 16, 16, 16, 16, 16, 20,  0, 17, 16, 16, 16, 16, 24, 20, 17, 16, 16, 16, 16, 16, 20,  0, 17, 16, 16, 16, 16, 24, 20,
-            25, 16, 16, 16, 24, 24, 28,  0, 25, 24, 24, 16, 20,  0, 21, 25, 16, 16, 16, 24, 24, 28,  0, 25, 24, 24, 16, 20,  0, 21,
-            1, 17, 16, 20,  0,  0,  0,  0,  0,  0,  0, 17, 20,  0, 21,  1, 17, 16, 20,  0,  0,  0,  0,  0,  0,  0, 17, 20,  0, 21,
-            1, 17, 16, 16, 18, 18, 22,  0, 19, 18, 18, 16, 20,  0, 21,  1, 17, 16, 16, 18, 18, 22,  0, 19, 18, 18, 16, 20,  0, 21,
-            1, 17, 16, 16, 16, 16, 20,  0, 17, 16, 16, 16, 20,  0, 21,  1, 17, 16, 16, 16, 16, 20,  0, 17, 16, 16, 16, 20,  0, 21,
-            1, 17, 16, 16, 16, 16, 20,  0, 17, 16, 16, 16, 20,  0, 21,  1, 17, 16, 16, 16, 16, 20,  0, 17, 16, 16, 16, 20,  0, 21,
-            1, 17, 16, 16, 16, 16, 16, 18, 16, 16, 16, 16, 20,  0, 21,  1, 17, 16, 16, 16, 16, 16, 18, 16, 16, 16, 16, 20,  0, 21,
-            1, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,  0, 21,  1, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,  0, 21,
-            1, 25, 24, 24, 24, 24, 24, 24, 24, 24, 16, 16, 16, 18, 20,  1, 25, 24, 24, 24, 24, 24, 24, 24, 24, 16, 16, 16, 18, 20,
-            9,  8,  8,  8,  8,  8,  8,  8,  8,  8, 25, 24, 24, 24, 28,  9,  8,  8,  8,  8,  8,  8,  8,  8,  8, 25, 24, 24, 24, 28
+            1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1,
+            1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1,
+            1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1,
+            1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1,
+            1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1,
     };
     //endregion
     private final int rows;
@@ -59,7 +49,14 @@ public class GameBoardPanel extends JPanel {
     private final ImageIcon dotIcon;
     private final ImageIcon wallIcon;
     private final ImageIcon emptyIcon;
+    private final ImageIcon heartIcon;
     private int pacmanAnimationIndex = 0;
+    private JPanel gameInfoPanel;
+    private JPanel heartsPanel;
+    private JLabel timeLabel;
+    private long startTime;
+    private JLabel pointsLabel;
+    private int points;
 
     public GameBoardPanel(int rows, int cols) {
         this.rows = rows;
@@ -71,21 +68,47 @@ public class GameBoardPanel extends JPanel {
         this.dotIcon = new ImageIcon("src/Pngs/dot.png");
         this.wallIcon = new ImageIcon("src/Pngs/wall.png");
         this.emptyIcon = new ImageIcon("src/Pngs/empty.png");
+        this.heartIcon = new ImageIcon("src/Pngs/heart.png");
 
         initializeDots();
         this.pacman = new Pacman(1, 1);
+        System.out.println(this.pacman.getLives());
         this.ghosts = new ArrayList<>();
         spawnGhosts(4);
 
-        this.setLayout(new GridLayout(rows, cols));
+        this.setLayout(new BorderLayout());
         this.setBackground(Color.BLACK);
 
+        gameInfoPanel = new JPanel();
+        gameInfoPanel.setBackground(Color.BLACK);
+        gameInfoPanel.setLayout(new BorderLayout());
+
+        heartsPanel = new JPanel();
+        heartsPanel.setBackground(Color.BLACK);
+        gameInfoPanel.add(heartsPanel, BorderLayout.WEST);
+
+        pointsLabel = new JLabel("Points: 0");
+        pointsLabel.setForeground(Color.WHITE);
+        pointsLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        gameInfoPanel.add(pointsLabel, BorderLayout.CENTER);
+
+        timeLabel = new JLabel("Time: 0s");
+        timeLabel.setForeground(Color.WHITE);
+        gameInfoPanel.add(timeLabel, BorderLayout.EAST);
+
+        add(gameInfoPanel, BorderLayout.NORTH);
+        updateHearts();
+
+        JPanel gridPanel = new JPanel(new GridLayout(rows, cols));
+        gridPanel.setBackground(Color.BLACK);
         Border border = BorderFactory.createLineBorder(Color.YELLOW, 3);
-        this.setBorder(border);
+        gridPanel.setBorder(border);
+
+        createGrid(gridPanel);
+
+        add(gridPanel, BorderLayout.CENTER);
 
         setFocusable(true);
-
-        createGrid();
 
         pacman.setCurrentIcons(pacman.pacmanIcons[0]);
         addKeyListener(new KeyAdapter() {
@@ -120,6 +143,7 @@ public class GameBoardPanel extends JPanel {
         startPacmanThread();
         startGhostThreads();
         startPacmanAnimationThread();
+        startGameTimer();
     }
 
     private int[][] generateMaze(int rows, int cols) {
@@ -142,7 +166,7 @@ public class GameBoardPanel extends JPanel {
         return maze;
     }
 
-    private void createGrid() {
+    private void createGrid(JPanel gridPanel) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 JLabel cell = new JLabel();
@@ -151,12 +175,11 @@ public class GameBoardPanel extends JPanel {
 
                 if (maze[i][j] == 1)
                     cell.setIcon(wallIcon);
-                 else if (dots[i][j])
+                else if (dots[i][j])
                     cell.setIcon(dotIcon);
 
-
                 grid[i][j] = cell;
-                this.add(cell);
+                gridPanel.add(cell);
             }
         }
 
@@ -180,6 +203,19 @@ public class GameBoardPanel extends JPanel {
         for (Ghost ghost : ghosts) {
             grid[ghost.getY()][ghost.getX()].setIcon(ghost.getIcon());
         }
+    }
+
+    private void updateHearts() {
+        heartsPanel.removeAll();
+        for (int i = 0; i < pacman.getLives(); i++) {
+            heartsPanel.add(new JLabel(heartIcon));
+        }
+        heartsPanel.revalidate();
+        heartsPanel.repaint();
+    }
+
+    private void updatePoints() {
+        pointsLabel.setText("Points: " + points);
     }
 
     private void startPacmanThread() {
@@ -217,6 +253,25 @@ public class GameBoardPanel extends JPanel {
         mouthAnimationThread.start();
     }
 
+    private void startGameTimer() {
+        startTime = System.currentTimeMillis();
+
+        Thread timerThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(1000);
+                    long elapsedTime = (System.currentTimeMillis() - startTime) / 1000;
+                    SwingUtilities.invokeLater(() -> timeLabel.setText("Time: " + elapsedTime + "s"));
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        });
+
+        timerThread.start();
+    }
+
     private void initializeDots() {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -232,6 +287,8 @@ public class GameBoardPanel extends JPanel {
         if (x >= 0 && x < cols && y >= 0 && y < rows && dots[y][x]) {
             dots[y][x] = false;
             grid[y][x].setIcon(emptyIcon);
+            points++;
+            updatePoints();
         }
     }
 
@@ -295,11 +352,14 @@ public class GameBoardPanel extends JPanel {
         for (Ghost ghost : ghosts) {
             if (pacman.getX() == ghost.getX() && pacman.getY() == ghost.getY()) {
                 pacman.loseLife();
-                if (pacman.getLives() <= 0) {
+                updateHearts();
+                System.out.println(pacman.getLives());
+
+                if (pacman.getLives() <= 0)
                     gameOver();
-                } else {
+                else
                     pacman.resetPacmanPosition();
-                }
+
             }
         }
     }

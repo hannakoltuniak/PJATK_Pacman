@@ -1,5 +1,5 @@
 package Characters;
-import Frames.GameBoardPanel;
+import Views.GameBoardPanel;
 
 import javax.swing.*;
 import java.util.Random;
