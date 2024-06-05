@@ -1,5 +1,6 @@
 package Views;
 
+import Serializable.Ranking;
 import javax.swing.*;
 import java.awt.*;
 
@@ -25,7 +26,7 @@ public class MenuFrame extends JFrame {
         this.setVisible(true);
     }
 
-    private void showMainMenu() {
+    public void showMainMenu() {
         mainPanel.removeAll();
 
         JLabel titleLabel = new JLabel("PACMAN", SwingConstants.CENTER);
@@ -36,6 +37,7 @@ public class MenuFrame extends JFrame {
         Font buttonFont = new Font("Arial", Font.PLAIN, 16);
         Dimension buttonSize = new Dimension(200, 50);
 
+        //region btns
         JButton newGameButton = new JButton("New Game");
         newGameButton.setFont(buttonFont);
         newGameButton.setPreferredSize(buttonSize);
@@ -50,6 +52,7 @@ public class MenuFrame extends JFrame {
         highScoresButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         highScoresButton.setForeground(Color.YELLOW);
         highScoresButton.setBackground(new Color(32, 32, 32));
+        highScoresButton.addActionListener(e -> showHighScores());
 
         JButton exitButton = new JButton("Exit");
         exitButton.setFont(buttonFont);
@@ -57,6 +60,7 @@ public class MenuFrame extends JFrame {
         exitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         exitButton.setForeground(Color.YELLOW);
         exitButton.setBackground(new Color(32, 32, 32));
+        exitButton.addActionListener(e -> System.exit(0));
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
@@ -69,6 +73,56 @@ public class MenuFrame extends JFrame {
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         buttonPanel.add(exitButton);
         buttonPanel.add(Box.createVerticalGlue());
+        //endregion
+
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+
+    private void showHighScores() {
+        mainPanel.removeAll();
+
+        JLabel titleLabel = new JLabel("High Scores", SwingConstants.CENTER);
+        titleLabel.setForeground(Color.YELLOW);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        mainPanel.add(titleLabel, BorderLayout.NORTH);
+
+        JTextArea highScoresArea = new JTextArea();
+        highScoresArea.setFont(new Font("Arial", Font.PLAIN, 16));
+        highScoresArea.setForeground(Color.YELLOW);
+        highScoresArea.setBackground(new Color(32, 32, 32));
+        highScoresArea.setEditable(false);
+
+        Ranking ranking = Ranking.loadRanking();
+        StringBuilder highScoresText = new StringBuilder();
+        for (Ranking.RankingEntry entry : ranking.getRankingEntries()) {
+            highScoresText.append(entry).append("\n");
+        }
+        highScoresArea.setText(highScoresText.toString());
+
+        JScrollPane scrollPane = new JScrollPane(highScoresArea);
+        scrollPane.setPreferredSize(new Dimension(400, 300));
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+
+        JButton backButton = new JButton("Back");
+        backButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        backButton.setPreferredSize(new Dimension(200, 50));
+        backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        backButton.setForeground(Color.YELLOW);
+        backButton.setBackground(new Color(32, 32, 32));
+        backButton.addActionListener(e -> showMainMenu());
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.setOpaque(false);
+        buttonPanel.add(Box.createVerticalGlue());
+        buttonPanel.add(backButton);
+        buttonPanel.add(Box.createVerticalGlue());
+
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         mainPanel.revalidate();
         mainPanel.repaint();
@@ -140,7 +194,7 @@ public class MenuFrame extends JFrame {
 
         JPanel wrapperPanel = new JPanel(new GridBagLayout());
         wrapperPanel.setOpaque(false);
-        GameBoardPanel gameBoard = new GameBoardPanel(rows, cols);
+        GameBoardPanel gameBoard = new GameBoardPanel(rows, cols, this);
         wrapperPanel.add(gameBoard);
 
         mainPanel.add(wrapperPanel, BorderLayout.CENTER);

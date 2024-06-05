@@ -1,5 +1,4 @@
 package Characters;
-
 import javax.swing.*;
 
 public class Pacman {

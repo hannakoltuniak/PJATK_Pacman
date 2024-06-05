@@ -1,7 +1,7 @@
 package Views;
 import Characters.Pacman;
 import Characters.Ghost;
-
+import Serializable.Ranking;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -40,6 +40,7 @@ public class GameBoardPanel extends JPanel {
     //endregion
     private final int rows;
     private final int cols;
+    private final MenuFrame menuFrame;
     private final int[][] maze;
     private final boolean[][] dots;
     private final Pacman pacman;
@@ -57,10 +58,14 @@ public class GameBoardPanel extends JPanel {
     private long startTime;
     private JLabel pointsLabel;
     private int points;
+    private boolean isPaused = false;
+    private JButton returnToMenuButton;
 
-    public GameBoardPanel(int rows, int cols) {
+    public GameBoardPanel(int rows, int cols, MenuFrame menuFrame) {
         this.rows = rows;
         this.cols = cols;
+        this.menuFrame = menuFrame;
+
         this.maze = generateMaze(rows, cols);
         this.dots = new boolean[rows][cols];
         this.grid = new JLabel[rows][cols];
@@ -104,6 +109,11 @@ public class GameBoardPanel extends JPanel {
         Border border = BorderFactory.createLineBorder(Color.YELLOW, 3);
         gridPanel.setBorder(border);
 
+        returnToMenuButton = new JButton("Return to Menu");
+        returnToMenuButton.setVisible(false);
+        returnToMenuButton.addActionListener(e -> returnToMenu());
+        this.add(returnToMenuButton, BorderLayout.SOUTH);
+
         createGrid(gridPanel);
 
         add(gridPanel, BorderLayout.CENTER);
@@ -115,30 +125,38 @@ public class GameBoardPanel extends JPanel {
             @Override
             public void keyPressed(KeyEvent e) {
                 int keyCode = e.getKeyCode();
-                switch (keyCode) {
-                    case KeyEvent.VK_UP:
-                        pacman.setDirection(0, -1);
-                        pacman.setCurrentIcons(pacman.pacmanIcons[1]);
-                        break;
-                    case KeyEvent.VK_DOWN:
-                        pacman.setDirection(0, 1);
-                        pacman.setCurrentIcons(pacman.pacmanIcons[3]);
-                        break;
-                    case KeyEvent.VK_LEFT:
-                        pacman.setDirection(-1, 0);
-                        pacman.setCurrentIcons(pacman.pacmanIcons[2]);
-                        break;
-                    case KeyEvent.VK_RIGHT:
-                        pacman.setDirection(1, 0);
-                        pacman.setCurrentIcons(pacman.pacmanIcons[0]);
-                        break;
+
+                if (!isPaused) {
+                    switch (keyCode) {
+                        case KeyEvent.VK_UP:
+                            pacman.setDirection(0, -1);
+                            pacman.setCurrentIcons(pacman.pacmanIcons[1]);
+                            break;
+                        case KeyEvent.VK_DOWN:
+                            pacman.setDirection(0, 1);
+                            pacman.setCurrentIcons(pacman.pacmanIcons[3]);
+                            break;
+                        case KeyEvent.VK_LEFT:
+                            pacman.setDirection(-1, 0);
+                            pacman.setCurrentIcons(pacman.pacmanIcons[2]);
+                            break;
+                        case KeyEvent.VK_RIGHT:
+                            pacman.setDirection(1, 0);
+                            pacman.setCurrentIcons(pacman.pacmanIcons[0]);
+                            break;
+                    }
+
+                    removeDot(pacman.getX(), pacman.getY());
+                    checkCollision();
+                    updateGrid();
                 }
 
-                removeDot(pacman.getX(), pacman.getY());
-                checkCollision();
-                updateGrid();
+                if (keyCode == KeyEvent.VK_SPACE) {
+                    togglePause();
+                }
             }
         });
+
 
         startPacmanThread();
         startGhostThreads();
@@ -223,10 +241,12 @@ public class GameBoardPanel extends JPanel {
             while (true) {
                 try {
                     Thread.sleep(200);
-                    pacman.move(maze);
-                    removeDot(pacman.getX(), pacman.getY());
-                    checkCollision();
-                    updateGrid();
+                    if (!isPaused) {
+                        pacman.move(maze);
+                        removeDot(pacman.getX(), pacman.getY());
+                        checkCollision();
+                        updateGrid();
+                    }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
@@ -242,8 +262,10 @@ public class GameBoardPanel extends JPanel {
             while (true) {
                 try {
                     Thread.sleep(100);
-                    pacmanAnimationIndex = (pacmanAnimationIndex + 1) % pacman.pacmanIcons.length;
-                    updateGrid();
+                    if (!isPaused) {
+                        pacmanAnimationIndex = (pacmanAnimationIndex + 1) % pacman.pacmanIcons.length;
+                        updateGrid();
+                    }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
@@ -260,8 +282,10 @@ public class GameBoardPanel extends JPanel {
             while (true) {
                 try {
                     Thread.sleep(1000);
-                    long elapsedTime = (System.currentTimeMillis() - startTime) / 1000;
-                    SwingUtilities.invokeLater(() -> timeLabel.setText("Time: " + elapsedTime + "s"));
+                    if (!isPaused) {
+                        long elapsedTime = (System.currentTimeMillis() - startTime) / 1000;
+                        SwingUtilities.invokeLater(() -> timeLabel.setText("Time: " + elapsedTime + "s"));
+                    }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
@@ -270,7 +294,7 @@ public class GameBoardPanel extends JPanel {
         });
 
         timerThread.start();
-    }
+}
 
     private void initializeDots() {
         for (int i = 0; i < rows; i++) {
@@ -316,13 +340,15 @@ public class GameBoardPanel extends JPanel {
                 while (true) {
                     try {
                         Thread.sleep(250);
-                        if (isPacmanClose(ghost)) {
-                            ghost.moveTowards(pacman.getX(), pacman.getY(), maze, this);
-                        } else {
-                            ghost.move(maze);
+                        if (!isPaused) {
+                            if (isPacmanClose(ghost)) {
+                                ghost.moveTowards(pacman.getX(), pacman.getY(), maze, this);
+                            } else {
+                                ghost.move(maze);
+                            }
+                            checkCollision();
+                            updateGrid();
                         }
-                        checkCollision();
-                        updateGrid();
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         break;
@@ -364,8 +390,26 @@ public class GameBoardPanel extends JPanel {
         }
     }
 
+    private void returnToMenu() {
+        System.out.println("Returning to Menu...");
+        menuFrame.showMainMenu();
+    }
+
+    private void togglePause() {
+        isPaused = !isPaused;
+        returnToMenuButton.setVisible(isPaused);
+
+    }
+
     private void gameOver() {
-        System.out.println("game over");
+        String playerName = JOptionPane.showInputDialog(this, "Game Over! Enter your name:", "Game Over", JOptionPane.PLAIN_MESSAGE);
+
+        if (playerName != null && !playerName.trim().isEmpty()) {
+            Ranking ranking = Ranking.loadRanking();
+            ranking.addEntry(new Ranking.RankingEntry(playerName, points));
+            ranking.saveRanking();
+        }
+
         System.exit(0);
     }
 }
