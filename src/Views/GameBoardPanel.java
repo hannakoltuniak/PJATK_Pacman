@@ -12,32 +12,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class GameBoardPanel extends JPanel {
-    //TODO: make better lvl data
-    //region Leveldata
-    private final short[] levelData = {
-            1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1,
-            1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1,
-            1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1,
-            1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1,
-            1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1,
-    };
-    //endregion
     private final int rows;
     private final int cols;
     private final MenuFrame menuFrame;
@@ -59,14 +33,15 @@ public class GameBoardPanel extends JPanel {
     private JLabel pointsLabel;
     private int points;
     private boolean isPaused = false;
+    private boolean collisionDetected = false;
     private JButton returnToMenuButton;
 
-    public GameBoardPanel(int rows, int cols, MenuFrame menuFrame) {
+    public GameBoardPanel(int rows, int cols, short[] levelData, MenuFrame menuFrame) {
         this.rows = rows;
         this.cols = cols;
         this.menuFrame = menuFrame;
 
-        this.maze = generateMaze(rows, cols);
+        this.maze = generateMaze(rows, cols, levelData);
         this.dots = new boolean[rows][cols];
         this.grid = new JLabel[rows][cols];
 
@@ -164,18 +139,18 @@ public class GameBoardPanel extends JPanel {
         startGameTimer();
     }
 
-    private int[][] generateMaze(int rows, int cols) {
+    private int[][] generateMaze(int rows, int cols, short[] levelData) {
         int[][] maze = new int[rows][cols];
-        int levelWidth = 30;
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                int index = i * levelWidth + j;
+                int index = i * cols + j;
 
-                if (index < levelData.length)
+                if (index < levelData.length) {
                     maze[i][j] = (levelData[index] == 0) ? 1 : 0;
-                else
+                } else {
                     maze[i][j] = 0;
+                }
             }
         }
 
@@ -375,17 +350,32 @@ public class GameBoardPanel extends JPanel {
     }
 
     private void checkCollision() {
+
+        if (collisionDetected) {
+            return;
+        }
+
         for (Ghost ghost : ghosts) {
             if (pacman.getX() == ghost.getX() && pacman.getY() == ghost.getY()) {
+                collisionDetected = true;
                 pacman.loseLife();
                 updateHearts();
                 System.out.println(pacman.getLives());
 
                 if (pacman.getLives() <= 0)
                     gameOver();
-                else
+                else {
                     pacman.resetPacmanPosition();
-
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                        collisionDetected = false;
+                    }).start();
+                }
+                return;
             }
         }
     }

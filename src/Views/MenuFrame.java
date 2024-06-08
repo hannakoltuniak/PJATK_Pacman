@@ -1,11 +1,13 @@
 package Views;
 
+import GameData.LevelData;
 import Serializable.Ranking;
 import javax.swing.*;
 import java.awt.*;
 
 public class MenuFrame extends JFrame {
     private final JPanel mainPanel;
+    private final LevelData levelData = new LevelData();
 
     public MenuFrame() {
         this.setTitle("HK_Pacman");
@@ -163,30 +165,36 @@ public class MenuFrame extends JFrame {
 
     private void startGameWithSize(String size) {
         int rows, cols;
+        short[] selectedLevelData;
+
         cols = switch (size) {
             case "Small" -> {
                 rows = 10;
+                selectedLevelData = levelData.levelDataSmall;
                 yield 10;
             }
             case "Medium" -> {
                 rows = 12;
+                selectedLevelData = levelData.levelDataMedium;
                 yield 12;
             }
             case "Large" -> {
                 rows = 15;
+                selectedLevelData = levelData.levelDataLarge;
                 yield 15;
             }
             case "Very Large" -> {
                 rows = 17;
+                selectedLevelData = levelData.levelDataVeryLarge;
                 yield 17;
             }
             case "Huge" -> {
                 rows = 20;
+                selectedLevelData = levelData.levelDataHuge;
                 yield 20;
             }
             default -> {
-                rows = 3;
-                yield 3;
+                throw new IllegalStateException("Wrong value");
             }
         };
 
@@ -194,7 +202,7 @@ public class MenuFrame extends JFrame {
 
         JPanel wrapperPanel = new JPanel(new GridBagLayout());
         wrapperPanel.setOpaque(false);
-        GameBoardPanel gameBoard = new GameBoardPanel(rows, cols, this);
+        GameBoardPanel gameBoard = new GameBoardPanel(rows, cols, selectedLevelData,this);
         wrapperPanel.add(gameBoard);
 
         mainPanel.add(wrapperPanel, BorderLayout.CENTER);

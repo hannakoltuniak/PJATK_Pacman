@@ -6,7 +6,7 @@ public class Pacman {
     private int y;
     private int dx;
     private int dy;
-    private int direction;
+    private int pacmanIconDirection;
     private ImageIcon[] currentIcons;
     public final ImageIcon[][] pacmanIcons;
     private int lives;
@@ -42,13 +42,15 @@ public class Pacman {
         this.dy = dy;
 
         if (dx == 1)
-            direction = 0; // Right
+            pacmanIconDirection = 0; // Right
         else if (dx == -1)
-            direction = 2; // Left
+            pacmanIconDirection = 2; // Left
          else if (dy == -1)
-            direction = 1; // Up
+            pacmanIconDirection = 1; // Up
         else if (dy == 1)
-            direction = 3; // Down
+            pacmanIconDirection = 3; // Down
+
+        this.currentIcons = pacmanIcons[pacmanIconDirection];
     }
 
     public int getX() {
