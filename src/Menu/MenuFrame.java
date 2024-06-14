@@ -209,7 +209,7 @@ public class MenuFrame extends JFrame {
 
         JPanel wrapperPanel = new JPanel(new GridBagLayout());
         wrapperPanel.setOpaque(false);
-        GameBoard gameBoard = new GameBoard(rows, cols, selectedLevelData, gameFrame);
+        GameBoard gameBoard = new GameBoard(rows, cols, selectedLevelData, gameFrame, this);
         wrapperPanel.add(gameBoard);
 
         gameFrame.add(wrapperPanel, BorderLayout.CENTER);

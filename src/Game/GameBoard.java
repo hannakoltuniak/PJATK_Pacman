@@ -45,11 +45,13 @@ public class GameBoard extends JPanel {
     private boolean speedBoostActive = false;
     private final int upgradeDuration = 15000;
     private final JFrame gameWindow;
+    private final MenuFrame menuFrame;
 
-    public GameBoard(int rows, int cols, short[] levelData, JFrame gameWindow) {
+    public GameBoard(int rows, int cols, short[] levelData, JFrame gameWindow, MenuFrame menuFrame) {
         this.rows = rows;
         this.cols = cols;
         this.gameWindow = gameWindow;
+        this.menuFrame = menuFrame;
 
         this.maze = generateMaze(rows, cols, levelData);
         this.dots = new boolean[rows][cols];
@@ -521,7 +523,7 @@ public class GameBoard extends JPanel {
     //endregion
 
     private void returnToMenu() {
-        MenuFrame menuFrame = new MenuFrame();
+        menuFrame.showMainMenu();
         menuFrame.setVisible(true);
         gameWindow.dispose();
     }
@@ -532,7 +534,7 @@ public class GameBoard extends JPanel {
     }
 
     private void gameOver() {
-        returnToMenuButton.setVisible(true);
+        returnToMenuButton.setVisible(false);
 
         String playerName = JOptionPane.showInputDialog(this, "Game Over! Enter your name:", "Game Over", JOptionPane.PLAIN_MESSAGE);
 
