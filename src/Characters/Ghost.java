@@ -1,5 +1,5 @@
 package Characters;
-import Game.GameBoardPanel;
+import Game.GameBoard;
 
 import javax.swing.*;
 import java.util.Random;
@@ -38,7 +38,7 @@ public class Ghost {
         }
     }
 
-    public void moveTowards(int pacmanX, int pacmanY, int[][] maze, GameBoardPanel gameBoard) {
+    public void moveTowards(int pacmanX, int pacmanY, int[][] maze, GameBoard gameBoard) {
         int bestX = x;
         int bestY = y;
         int bestDistance = Math.abs(pacmanX - x) + Math.abs(pacmanY - y);

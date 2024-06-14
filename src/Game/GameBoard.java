@@ -13,7 +13,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import Menu.*;
 
-public class GameBoardPanel extends JPanel {
+public class GameBoard extends JPanel {
     private final int rows;
     private final int cols;
     private final MenuFrame menuFrame;
@@ -42,9 +42,9 @@ public class GameBoardPanel extends JPanel {
     private boolean immunityActive = false;
     private boolean dumberGhostsActive = false;
     private boolean speedBoostActive = false;
-    private final int UPGRADE_DURATION = 15000; // 15 seconds
+    private final int upgradeDuration = 15000;
 
-    public GameBoardPanel(int rows, int cols, short[] levelData, MenuFrame menuFrame) {
+    public GameBoard(int rows, int cols, short[] levelData, MenuFrame menuFrame) {
         this.rows = rows;
         this.cols = cols;
         this.menuFrame = menuFrame;
@@ -60,6 +60,7 @@ public class GameBoardPanel extends JPanel {
         this.upgradeIcon = new ImageIcon("src/Pngs/upgrade.png");
 
         initializeDots();
+
         this.pacman = new Pacman(1, 1);
         System.out.println(this.pacman.getLives());
 
@@ -97,6 +98,11 @@ public class GameBoardPanel extends JPanel {
 
         returnToMenuButton = new JButton("Return to Menu");
         returnToMenuButton.setVisible(false);
+        returnToMenuButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        returnToMenuButton.setPreferredSize(new Dimension(200, 50));
+        returnToMenuButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        returnToMenuButton.setForeground(Color.YELLOW);
+        returnToMenuButton.setBackground(new Color(32, 32, 32));
         returnToMenuButton.addActionListener(e -> returnToMenu());
         this.add(returnToMenuButton, BorderLayout.SOUTH);
 
@@ -133,7 +139,7 @@ public class GameBoardPanel extends JPanel {
                     }
 
                     removeDot(pacman.getX(), pacman.getY());
-                    checkCollisionWithGhosts();
+                    checkCollision();
                     updateGrid();
                 }
 
@@ -233,7 +239,7 @@ public class GameBoardPanel extends JPanel {
                     if (!isPaused) {
                         pacman.move(maze);
                         removeDot(pacman.getX(), pacman.getY());
-                        checkCollisionWithGhosts();
+                        checkCollision();
                         updateGrid();
                     }
                 } catch (InterruptedException e) {
@@ -335,7 +341,7 @@ public class GameBoardPanel extends JPanel {
                             } else {
                                 ghost.move(maze);
                             }
-                            checkCollisionWithGhosts();
+                            checkCollision();
                             updateGrid();
                         }
                     } catch (InterruptedException e) {
@@ -383,7 +389,6 @@ public class GameBoardPanel extends JPanel {
             grid[upgradeY][upgradeX].setIcon(upgradeIcon);
             updateGrid();
 
-            System.out.println("upgrade created at (" + upgradeX + ", " + upgradeY + "); type " + pacmanUpgrade.currentUpgradeType);
         }
     }
 
@@ -402,7 +407,7 @@ public class GameBoardPanel extends JPanel {
         return false;
     }
 
-    private void checkCollisionWithGhosts() {
+    private void checkCollision() {
         checkGhostCollision();
         checkUpgradeCollision();
     }
@@ -470,21 +475,41 @@ public class GameBoardPanel extends JPanel {
 
     private void activateImmunity() {
         immunityActive = true;
-        new Timer(UPGRADE_DURATION, e -> immunityActive = false).start();
+        new Thread(() -> {
+            try {
+                Thread.sleep(upgradeDuration);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            immunityActive = false;
+        }).start();
     }
 
     private void activateDumberGhosts() {
         dumberGhostsActive = true;
-        new Timer(UPGRADE_DURATION, e -> dumberGhostsActive = false).start();
+        new Thread(() -> {
+            try {
+                Thread.sleep(upgradeDuration);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            dumberGhostsActive = false;
+        }).start();
     }
 
     private void activateSpeedBoost() {
         speedBoostActive = true;
-        new Timer(UPGRADE_DURATION, e -> speedBoostActive = false).start();
+        new Thread(() -> {
+            try {
+                Thread.sleep(upgradeDuration);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            speedBoostActive = false;
+        }).start();
     }
 
     private void returnToMenu() {
-        System.out.println("Returning to Menu...");
         menuFrame.showMainMenu();
     }
 
