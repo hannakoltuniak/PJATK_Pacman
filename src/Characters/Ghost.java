@@ -64,8 +64,11 @@ public class Ghost {
         y = bestY;
     }
 
-
     public ImageIcon getIcon() {
         return icon;
+    }
+
+    public void CreateUpgrade() {
+
     }
 }

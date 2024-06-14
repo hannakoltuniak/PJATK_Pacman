@@ -1,6 +1,7 @@
 package Views;
 import Characters.Pacman;
 import Characters.Ghost;
+import GameData.PacmanUpgrades;
 import Serializable.Ranking;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,16 +26,18 @@ public class GameBoardPanel extends JPanel {
     private final ImageIcon wallIcon;
     private final ImageIcon emptyIcon;
     private final ImageIcon heartIcon;
+    private final ImageIcon upgradeIcon;
     private int pacmanAnimationIndex = 0;
-    private JPanel gameInfoPanel;
-    private JPanel heartsPanel;
-    private JLabel timeLabel;
+    private final JPanel heartsPanel;
+    private final JLabel timeLabel;
     private long startTime;
-    private JLabel pointsLabel;
+    private final JLabel pointsLabel;
     private int points;
     private boolean isPaused = false;
     private boolean collisionDetected = false;
-    private JButton returnToMenuButton;
+    private boolean upgradeCreated = false;
+    private final JButton returnToMenuButton;
+    private PacmanUpgrades pacmanUpgrade;
 
     public GameBoardPanel(int rows, int cols, short[] levelData, MenuFrame menuFrame) {
         this.rows = rows;
@@ -49,17 +52,20 @@ public class GameBoardPanel extends JPanel {
         this.wallIcon = new ImageIcon("src/Pngs/wall.png");
         this.emptyIcon = new ImageIcon("src/Pngs/empty.png");
         this.heartIcon = new ImageIcon("src/Pngs/heart.png");
+        this.upgradeIcon = new ImageIcon("src/Pngs/upgrade.png");
 
         initializeDots();
         this.pacman = new Pacman(1, 1);
         System.out.println(this.pacman.getLives());
+
         this.ghosts = new ArrayList<>();
-        spawnGhosts(4);
+        int numberOfGhosts = 4;
+        spawnGhosts(numberOfGhosts);
 
         this.setLayout(new BorderLayout());
         this.setBackground(Color.BLACK);
 
-        gameInfoPanel = new JPanel();
+        JPanel gameInfoPanel = new JPanel();
         gameInfoPanel.setBackground(Color.BLACK);
         gameInfoPanel.setLayout(new BorderLayout());
 
@@ -184,6 +190,8 @@ public class GameBoardPanel extends JPanel {
             for (int j = 0; j < cols; j++) {
                 if (maze[i][j] == 1) {
                     grid[i][j].setIcon(wallIcon);
+                } else if (upgradeCreated && pacmanUpgrade != null && pacmanUpgrade.getX() == j && pacmanUpgrade.getY() == i) {
+                    grid[i][j].setIcon(upgradeIcon);
                 } else if (dots[i][j]) {
                     grid[i][j].setIcon(dotIcon);
                 } else {
@@ -330,7 +338,46 @@ public class GameBoardPanel extends JPanel {
                     }
                 }
             });
+
+            Thread upgradeThreat = new Thread(() -> {
+                Random random = new Random();
+                while (true) {
+                    try {
+                        Thread.sleep(5000);
+                        if (!isPaused) {
+                            double probability = random.nextDouble();
+                            if (probability < 0.25) {
+                                createUpgrade(ghost.getX(), ghost.getY());
+                            }
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
+            });
+
+            upgradeThreat.start();
             ghostThread.start();
+        }
+    }
+
+    private void createUpgrade(int upgradeX, int upgradeY) {
+        if (upgradeCreated) {
+            return;
+        }
+
+        if (upgradeX >= 0 && upgradeX < cols && upgradeY >= 0 && upgradeY < rows) {
+            dots[upgradeY][upgradeX] = false;
+
+            pacmanUpgrade = new PacmanUpgrades(upgradeX, upgradeY);
+            pacmanUpgrade.getRandomUpgrade();
+
+            upgradeCreated = true;
+            grid[upgradeY][upgradeX].setIcon(upgradeIcon);
+            updateGrid();
+
+            System.out.println("upgrade created at (" + upgradeX + ", " + upgradeY + "); type " + pacmanUpgrade.currentUpgradeType);
         }
     }
 
@@ -350,7 +397,6 @@ public class GameBoardPanel extends JPanel {
     }
 
     private void checkCollision() {
-
         if (collisionDetected) {
             return;
         }
@@ -362,9 +408,9 @@ public class GameBoardPanel extends JPanel {
                 updateHearts();
                 System.out.println(pacman.getLives());
 
-                if (pacman.getLives() <= 0)
+                if (pacman.getLives() <= 0) {
                     gameOver();
-                else {
+                } else {
                     pacman.resetPacmanPosition();
                     new Thread(() -> {
                         try {
@@ -378,7 +424,40 @@ public class GameBoardPanel extends JPanel {
                 return;
             }
         }
+
+        if (upgradeCreated && pacman.getX() == pacmanUpgrade.getX() && pacman.getY() == pacmanUpgrade.getY()) {
+            switch (pacmanUpgrade.currentUpgradeType) {
+                case LIFE1:
+                    pacman.addLife(1);
+                    updateHearts();
+                    break;
+                case IMMUNITY:
+
+
+                    break;
+                case DUMBER_GHOSTS:
+
+                    break;
+                case SPEEDx10:
+
+                    break;
+                case POINTS50:
+                    points += 50;
+                    break;
+            }
+
+            System.out.println("Upgrade claimed at (" + pacmanUpgrade.getX() + ", " + pacmanUpgrade.getY() + ")");
+
+            grid[pacmanUpgrade.getY()][pacmanUpgrade.getX()].setIcon(emptyIcon);
+            dots[pacmanUpgrade.getY()][pacmanUpgrade.getX()] = false;
+
+            upgradeCreated = false;
+            pacmanUpgrade = null;
+            updateGrid();
+        }
     }
+
+
 
     private void returnToMenu() {
         System.out.println("Returning to Menu...");
@@ -400,6 +479,6 @@ public class GameBoardPanel extends JPanel {
             ranking.saveRanking();
         }
 
-        System.exit(0);
+        returnToMenu();
     }
 }

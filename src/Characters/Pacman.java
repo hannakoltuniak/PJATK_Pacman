@@ -96,4 +96,8 @@ public class Pacman {
             lives--;
         }
     }
+
+    public void addLife(int num) {
+        lives += num;
+    }
 }
