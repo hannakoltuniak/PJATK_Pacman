@@ -1,8 +1,8 @@
-package Views;
+package Game;
+
 import Characters.Pacman;
 import Characters.Ghost;
 import GameData.PacmanUpgrades;
-import Serializable.Ranking;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -11,6 +11,7 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import Menu.*;
 
 public class GameBoardPanel extends JPanel {
     private final int rows;
@@ -38,6 +39,10 @@ public class GameBoardPanel extends JPanel {
     private boolean upgradeCreated = false;
     private final JButton returnToMenuButton;
     private PacmanUpgrades pacmanUpgrade;
+    private boolean immunityActive = false;
+    private boolean dumberGhostsActive = false;
+    private boolean speedBoostActive = false;
+    private final int UPGRADE_DURATION = 15000; // 15 seconds
 
     public GameBoardPanel(int rows, int cols, short[] levelData, MenuFrame menuFrame) {
         this.rows = rows;
@@ -128,7 +133,7 @@ public class GameBoardPanel extends JPanel {
                     }
 
                     removeDot(pacman.getX(), pacman.getY());
-                    checkCollision();
+                    checkCollisionWithGhosts();
                     updateGrid();
                 }
 
@@ -223,11 +228,12 @@ public class GameBoardPanel extends JPanel {
         Thread pacmanThread = new Thread(() -> {
             while (true) {
                 try {
-                    Thread.sleep(200);
+                    int sleepTime = speedBoostActive ? 100 : 200;
+                    Thread.sleep(sleepTime);
                     if (!isPaused) {
                         pacman.move(maze);
                         removeDot(pacman.getX(), pacman.getY());
-                        checkCollision();
+                        checkCollisionWithGhosts();
                         updateGrid();
                     }
                 } catch (InterruptedException e) {
@@ -277,7 +283,7 @@ public class GameBoardPanel extends JPanel {
         });
 
         timerThread.start();
-}
+    }
 
     private void initializeDots() {
         for (int i = 0; i < rows; i++) {
@@ -301,7 +307,7 @@ public class GameBoardPanel extends JPanel {
 
     private void spawnGhosts(int numGhosts) {
         ImageIcon[] ghostIcons = {
-            new ImageIcon("src/Pngs/ghosts/ghost_blue.png"), new ImageIcon("src/Pngs/ghosts/ghost_orange.png"), new ImageIcon("src/Pngs/ghosts/ghost_pink.png"), new ImageIcon("src/Pngs/ghosts/ghost_red.png")
+                new ImageIcon("src/Pngs/ghosts/ghost_blue.png"), new ImageIcon("src/Pngs/ghosts/ghost_orange.png"), new ImageIcon("src/Pngs/ghosts/ghost_pink.png"), new ImageIcon("src/Pngs/ghosts/ghost_red.png")
         };
         int imageIndex = 0;
 
@@ -324,12 +330,12 @@ public class GameBoardPanel extends JPanel {
                     try {
                         Thread.sleep(250);
                         if (!isPaused) {
-                            if (isPacmanClose(ghost)) {
+                            if (!dumberGhostsActive && isPacmanClose(ghost)) {
                                 ghost.moveTowards(pacman.getX(), pacman.getY(), maze, this);
                             } else {
                                 ghost.move(maze);
                             }
-                            checkCollision();
+                            checkCollisionWithGhosts();
                             updateGrid();
                         }
                     } catch (InterruptedException e) {
@@ -396,8 +402,13 @@ public class GameBoardPanel extends JPanel {
         return false;
     }
 
-    private void checkCollision() {
-        if (collisionDetected) {
+    private void checkCollisionWithGhosts() {
+        checkGhostCollision();
+        checkUpgradeCollision();
+    }
+
+    private void checkGhostCollision() {
+        if (collisionDetected || immunityActive) {
             return;
         }
 
@@ -424,7 +435,9 @@ public class GameBoardPanel extends JPanel {
                 return;
             }
         }
+    }
 
+    private void checkUpgradeCollision() {
         if (upgradeCreated && pacman.getX() == pacmanUpgrade.getX() && pacman.getY() == pacmanUpgrade.getY()) {
             switch (pacmanUpgrade.currentUpgradeType) {
                 case LIFE1:
@@ -432,21 +445,19 @@ public class GameBoardPanel extends JPanel {
                     updateHearts();
                     break;
                 case IMMUNITY:
-
-
+                    activateImmunity();
                     break;
                 case DUMBER_GHOSTS:
-
+                    activateDumberGhosts();
                     break;
-                case SPEEDx10:
-
+                case SPEEDx2:
+                    activateSpeedBoost();
                     break;
                 case POINTS50:
                     points += 50;
+                    updatePoints();
                     break;
             }
-
-            System.out.println("Upgrade claimed at (" + pacmanUpgrade.getX() + ", " + pacmanUpgrade.getY() + ")");
 
             grid[pacmanUpgrade.getY()][pacmanUpgrade.getX()].setIcon(emptyIcon);
             dots[pacmanUpgrade.getY()][pacmanUpgrade.getX()] = false;
@@ -457,7 +468,20 @@ public class GameBoardPanel extends JPanel {
         }
     }
 
+    private void activateImmunity() {
+        immunityActive = true;
+        new Timer(UPGRADE_DURATION, e -> immunityActive = false).start();
+    }
 
+    private void activateDumberGhosts() {
+        dumberGhostsActive = true;
+        new Timer(UPGRADE_DURATION, e -> dumberGhostsActive = false).start();
+    }
+
+    private void activateSpeedBoost() {
+        speedBoostActive = true;
+        new Timer(UPGRADE_DURATION, e -> speedBoostActive = false).start();
+    }
 
     private void returnToMenu() {
         System.out.println("Returning to Menu...");
@@ -467,16 +491,15 @@ public class GameBoardPanel extends JPanel {
     private void togglePause() {
         isPaused = !isPaused;
         returnToMenuButton.setVisible(isPaused);
-
     }
 
     private void gameOver() {
         String playerName = JOptionPane.showInputDialog(this, "Game Over! Enter your name:", "Game Over", JOptionPane.PLAIN_MESSAGE);
 
         if (playerName != null && !playerName.trim().isEmpty()) {
-            Ranking ranking = Ranking.loadRanking();
-            ranking.addEntry(new Ranking.RankingEntry(playerName, points));
-            ranking.saveRanking();
+            Scores ranking = Scores.loadScore();
+            ranking.addEntry(new Scores.ScoresEntry(playerName, points));
+            ranking.saveScore();
         }
 
         returnToMenu();

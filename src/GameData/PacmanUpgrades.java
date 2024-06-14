@@ -4,12 +4,10 @@ import java.util.Random;
 
 public class PacmanUpgrades {
     public enum UpgradeType {
-        LIFE1, IMMUNITY, DUMBER_GHOSTS, SPEEDx10, POINTS50
+        LIFE1, IMMUNITY, DUMBER_GHOSTS, SPEEDx2, POINTS50
     }
-
     private int x;
     private int y;
-
     public UpgradeType currentUpgradeType;
 
     public PacmanUpgrades(int x, int y) {

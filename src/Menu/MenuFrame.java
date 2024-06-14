@@ -1,7 +1,7 @@
-package Views;
+package Menu;
 
 import GameData.LevelData;
-import Serializable.Ranking;
+import Game.*;
 import javax.swing.*;
 import java.awt.*;
 
@@ -95,9 +95,9 @@ public class MenuFrame extends JFrame {
         highScoresArea.setBackground(new Color(32, 32, 32));
         highScoresArea.setEditable(false);
 
-        Ranking ranking = Ranking.loadRanking();
+        Scores scores = Scores.loadScore();
         StringBuilder highScoresText = new StringBuilder();
-        for (Ranking.RankingEntry entry : ranking.getRankingEntries()) {
+        for (Scores.ScoresEntry entry : scores.getScoreEntries()) {
             highScoresText.append(entry).append("\n");
         }
         highScoresArea.setText(highScoresText.toString());

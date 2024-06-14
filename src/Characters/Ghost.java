@@ -1,5 +1,5 @@
 package Characters;
-import Views.GameBoardPanel;
+import Game.GameBoardPanel;
 
 import javax.swing.*;
 import java.util.Random;
@@ -7,7 +7,7 @@ import java.util.Random;
 public class Ghost {
     private int x, y;
     private final Random random;
-    private ImageIcon icon;
+    private final ImageIcon icon;
 
     public Ghost(int x, int y, ImageIcon icon) {
         this.x = x;
@@ -39,7 +39,8 @@ public class Ghost {
     }
 
     public void moveTowards(int pacmanX, int pacmanY, int[][] maze, GameBoardPanel gameBoard) {
-        int bestX = x, bestY = y;
+        int bestX = x;
+        int bestY = y;
         int bestDistance = Math.abs(pacmanX - x) + Math.abs(pacmanY - y);
 
         int[] dx = {0, 1, 0, -1};
@@ -49,8 +50,7 @@ public class Ghost {
             int newX = x + dx[i];
             int newY = y + dy[i];
 
-            if (newX >= 0 && newX < maze[0].length && newY >= 0 && newY < maze.length && maze[newY][newX] == 0 &&
-                    !gameBoard.isPositionAvailable(newX, newY)) {
+            if (newX >= 0 && newX < maze[0].length && newY >= 0 && newY < maze.length && maze[newY][newX] == 0 && !gameBoard.isPositionAvailable(newX, newY)) {
                 int newDistance = Math.abs(pacmanX - newX) + Math.abs(pacmanY - newY);
                 if (newDistance < bestDistance) {
                     bestX = newX;
@@ -66,9 +66,5 @@ public class Ghost {
 
     public ImageIcon getIcon() {
         return icon;
-    }
-
-    public void CreateUpgrade() {
-
     }
 }
