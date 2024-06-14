@@ -2,6 +2,7 @@ package Game;
 
 import Characters.Pacman;
 import Characters.Ghost;
+import Menu.MenuFrame;
 import GameData.PacmanUpgrades;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,6 @@ import Menu.*;
 public class GameBoard extends JPanel {
     private final int rows;
     private final int cols;
-    private final MenuFrame menuFrame;
     private final int[][] maze;
     private final boolean[][] dots;
     private final Pacman pacman;
@@ -35,6 +35,7 @@ public class GameBoard extends JPanel {
     private final JLabel pointsLabel;
     private int points;
     private boolean isPaused = false;
+    private boolean isOver = false;
     private boolean collisionDetected = false;
     private boolean upgradeCreated = false;
     private final JButton returnToMenuButton;
@@ -43,11 +44,12 @@ public class GameBoard extends JPanel {
     private boolean dumberGhostsActive = false;
     private boolean speedBoostActive = false;
     private final int upgradeDuration = 15000;
+    private final JFrame gameWindow;
 
-    public GameBoard(int rows, int cols, short[] levelData, MenuFrame menuFrame) {
+    public GameBoard(int rows, int cols, short[] levelData, JFrame gameWindow) {
         this.rows = rows;
         this.cols = cols;
-        this.menuFrame = menuFrame;
+        this.gameWindow = gameWindow;
 
         this.maze = generateMaze(rows, cols, levelData);
         this.dots = new boolean[rows][cols];
@@ -111,6 +113,8 @@ public class GameBoard extends JPanel {
         add(gridPanel, BorderLayout.CENTER);
 
         setFocusable(true);
+
+        isOver = false;
 
         pacman.setCurrentIcons(pacman.pacmanIcons[0]);
         addKeyListener(new KeyAdapter() {
@@ -196,6 +200,26 @@ public class GameBoard extends JPanel {
         updateGrid();
     }
 
+    private void initializeDots() {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (maze[i][j] == 0)
+                    dots[i][j] = true;
+            }
+        }
+
+        dots[1][1] = false;
+    }
+
+    private void removeDot(int x, int y) {
+        if (x >= 0 && x < cols && y >= 0 && y < rows && dots[y][x]) {
+            dots[y][x] = false;
+            grid[y][x].setIcon(emptyIcon);
+            points++;
+            updatePoints();
+        }
+    }
+
     private void updateGrid() {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -274,7 +298,7 @@ public class GameBoard extends JPanel {
         startTime = System.currentTimeMillis();
 
         Thread timerThread = new Thread(() -> {
-            while (true) {
+            while (!isOver) {
                 try {
                     Thread.sleep(1000);
                     if (!isPaused) {
@@ -291,26 +315,12 @@ public class GameBoard extends JPanel {
         timerThread.start();
     }
 
-    private void initializeDots() {
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (maze[i][j] == 0)
-                    dots[i][j] = true;
-            }
-        }
-
-        dots[1][1] = false;
+    private void checkCollision() {
+        checkGhostCollision();
+        checkUpgradeCollision();
     }
 
-    private void removeDot(int x, int y) {
-        if (x >= 0 && x < cols && y >= 0 && y < rows && dots[y][x]) {
-            dots[y][x] = false;
-            grid[y][x].setIcon(emptyIcon);
-            points++;
-            updatePoints();
-        }
-    }
-
+    //region Ghosts
     private void spawnGhosts(int numGhosts) {
         ImageIcon[] ghostIcons = {
                 new ImageIcon("src/Pngs/ghosts/ghost_blue.png"), new ImageIcon("src/Pngs/ghosts/ghost_orange.png"), new ImageIcon("src/Pngs/ghosts/ghost_pink.png"), new ImageIcon("src/Pngs/ghosts/ghost_red.png")
@@ -374,24 +384,6 @@ public class GameBoard extends JPanel {
         }
     }
 
-    private void createUpgrade(int upgradeX, int upgradeY) {
-        if (upgradeCreated) {
-            return;
-        }
-
-        if (upgradeX >= 0 && upgradeX < cols && upgradeY >= 0 && upgradeY < rows) {
-            dots[upgradeY][upgradeX] = false;
-
-            pacmanUpgrade = new PacmanUpgrades(upgradeX, upgradeY);
-            pacmanUpgrade.getRandomUpgrade();
-
-            upgradeCreated = true;
-            grid[upgradeY][upgradeX].setIcon(upgradeIcon);
-            updateGrid();
-
-        }
-    }
-
     private boolean isPacmanClose(Ghost ghost) {
         int distance = Math.abs(pacman.getX() - ghost.getX()) + Math.abs(pacman.getY() - ghost.getY());
         int range = 5;
@@ -407,11 +399,6 @@ public class GameBoard extends JPanel {
         return false;
     }
 
-    private void checkCollision() {
-        checkGhostCollision();
-        checkUpgradeCollision();
-    }
-
     private void checkGhostCollision() {
         if (collisionDetected || immunityActive) {
             return;
@@ -425,6 +412,7 @@ public class GameBoard extends JPanel {
                 System.out.println(pacman.getLives());
 
                 if (pacman.getLives() <= 0) {
+                    isOver = true;
                     gameOver();
                 } else {
                     pacman.resetPacmanPosition();
@@ -441,9 +429,31 @@ public class GameBoard extends JPanel {
             }
         }
     }
+    //endregion
 
-    private void checkUpgradeCollision() {
-        if (upgradeCreated && pacman.getX() == pacmanUpgrade.getX() && pacman.getY() == pacmanUpgrade.getY()) {
+    //region Upgrades
+    private synchronized void createUpgrade(int upgradeX, int upgradeY) {
+        if (upgradeCreated) {
+            return;
+        }
+
+        if (upgradeX >= 0 && upgradeX < cols && upgradeY >= 0 && upgradeY < rows) {
+            dots[upgradeY][upgradeX] = false;
+
+            pacmanUpgrade = new PacmanUpgrades(upgradeX, upgradeY);
+            pacmanUpgrade.getRandomUpgrade();
+
+            upgradeCreated = true;
+            grid[upgradeY][upgradeX].setIcon(upgradeIcon);
+            updateGrid();
+            System.out.println("created " + pacmanUpgrade.currentUpgradeType);
+        }
+    }
+
+    private synchronized void checkUpgradeCollision() {
+        if (upgradeCreated && pacmanUpgrade != null && pacman.getX() == pacmanUpgrade.getX() && pacman.getY() == pacmanUpgrade.getY()) {
+            System.out.println("Pacman collided with an upgrade: " + pacmanUpgrade.currentUpgradeType);
+
             switch (pacmanUpgrade.currentUpgradeType) {
                 case LIFE1:
                     pacman.addLife(1);
@@ -508,9 +518,12 @@ public class GameBoard extends JPanel {
             speedBoostActive = false;
         }).start();
     }
+    //endregion
 
     private void returnToMenu() {
-        menuFrame.showMainMenu();
+        MenuFrame menuFrame = new MenuFrame();
+        menuFrame.setVisible(true);
+        gameWindow.dispose();
     }
 
     private void togglePause() {
@@ -519,11 +532,13 @@ public class GameBoard extends JPanel {
     }
 
     private void gameOver() {
+        returnToMenuButton.setVisible(true);
+
         String playerName = JOptionPane.showInputDialog(this, "Game Over! Enter your name:", "Game Over", JOptionPane.PLAIN_MESSAGE);
 
         if (playerName != null && !playerName.trim().isEmpty()) {
             Scores ranking = Scores.loadScore();
-            ranking.addEntry(new Scores.ScoresEntry(playerName, points));
+            ranking.addEntry(new Scores.ScoresEntry(playerName, points, rows));
             ranking.saveScore();
         }
 

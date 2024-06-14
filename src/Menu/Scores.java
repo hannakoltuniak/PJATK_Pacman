@@ -42,10 +42,12 @@ public class Scores implements Serializable {
         private static final long serialVersionUID = 1L;
         private String name;
         private int points;
+        private int boardSize;
 
-        public ScoresEntry(String name, int points) {
+        public ScoresEntry(String name, int points, int boardSize) {
             this.name = name;
             this.points = points;
+            this.boardSize = boardSize;
         }
 
         @Override
@@ -55,7 +57,7 @@ public class Scores implements Serializable {
 
         @Override
         public String toString() {
-            return name + " - " + points;
+            return name + " - " + points + " (Board Size: " + boardSize + "x" + boardSize + ")";
         }
     }
 }

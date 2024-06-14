@@ -13,8 +13,8 @@ public class MenuFrame extends JFrame {
         this.setTitle("HK_Pacman");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(800, 800);
-        this.setResizable(false);
-        ImageIcon icon = new ImageIcon("src/pngs/pacman_logo.png");
+        this.setResizable(true);
+        ImageIcon icon = new ImageIcon("src/pngs/pacman/pacman_right_1.png");
         this.setIconImage(icon.getImage());
         this.getContentPane().setBackground(new Color(32, 32, 32));
         this.setLayout(new BorderLayout());
@@ -198,16 +198,22 @@ public class MenuFrame extends JFrame {
             }
         };
 
-        mainPanel.removeAll();
+        this.dispose();
+
+        JFrame gameFrame = new JFrame("Pacman - " + size);
+        gameFrame.setSize(500, 500);
+        gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gameFrame.setResizable(true);
+        gameFrame.getContentPane().setBackground(new Color(32, 32, 32));
+        gameFrame.setLayout(new BorderLayout());
 
         JPanel wrapperPanel = new JPanel(new GridBagLayout());
         wrapperPanel.setOpaque(false);
-        GameBoard gameBoard = new GameBoard(rows, cols, selectedLevelData,this);
+        GameBoard gameBoard = new GameBoard(rows, cols, selectedLevelData, gameFrame);
         wrapperPanel.add(gameBoard);
 
-        mainPanel.add(wrapperPanel, BorderLayout.CENTER);
-        mainPanel.revalidate();
-        mainPanel.repaint();
+        gameFrame.add(wrapperPanel, BorderLayout.CENTER);
+        gameFrame.setVisible(true);
 
         gameBoard.requestFocusInWindow();
     }
